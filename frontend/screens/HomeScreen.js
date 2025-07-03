@@ -5,12 +5,14 @@ import { ActivityIndicator, Alert, FlatList, Platform, StyleSheet, Text, Touchab
 import { v4 as uuidv4 } from 'uuid';
 import MapModal from '../components/MapModal';
 import PhotoCard from '../components/PhotoCard';
+import PhotoDetailModal from '../components/PhotoDetailModal';
 import { getDescriptionFromGemini } from '../services/gemini';
 import { loadPhotos, savePhotos } from '../utils/storage';
 
 export default function HomeScreen() {
   const [photos, setPhotos] = useState([]);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [detailPhoto, setDetailPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [debug, setDebug] = useState('');
@@ -164,6 +166,10 @@ export default function HomeScreen() {
     );
   };
 
+  const handleViewDetails = (photo) => {
+    setDetailPhoto(photo);
+  };
+
   console.log('photos:', photos);
 
   return (
@@ -190,6 +196,7 @@ export default function HomeScreen() {
           <PhotoCard
             photo={item}
             onSelect={setSelectedPhoto}
+            onViewDetails={handleViewDetails}
             onDelete={deletePhoto}
             style={styles.cardWrapper}
           />
@@ -206,6 +213,7 @@ export default function HomeScreen() {
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
       <MapModal photo={selectedPhoto} onClose={() => setSelectedPhoto(null)} />
+      <PhotoDetailModal photo={detailPhoto} onClose={() => setDetailPhoto(null)} />
     </View>
   );
 }

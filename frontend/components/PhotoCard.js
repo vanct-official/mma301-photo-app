@@ -1,23 +1,25 @@
 import React, { useState } from 'react';
-import { Button, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { View, Text, Image, Button, StyleSheet, TouchableOpacity } from 'react-native';
 
 /**
- * A component that renders a photo card with its metadata, and a button to delete it.
+ * A component that renders a photo card with its metadata, and buttons to view details and delete it.
  *
  * @param {{uri: string, timestamp: string, description: string, location: object} & {id: string}} photo
  * The photo data to display.
  * @param {function(photo: {uri: string, timestamp: string, description: string, location: object} & {id: string}): void} onSelect
- * Called when the user taps on the photo.
+ * Called when the user taps on the photo (for map view).
+ * @param {function(photo: {uri: string, timestamp: string, description: string, location: object} & {id: string}): void} onViewDetails
+ * Called when the user taps on the View Details button.
  * @param {function(id: string): void} onDelete
  * Called when the user taps on the Delete button.
  * @param {object} style - Optional style for the card wrapper
  */
-const PhotoCard = ({ photo, onSelect, onDelete, style }) => {
+const PhotoCard = ({ photo, onSelect, onViewDetails, onDelete, style }) => {
   const [imageError, setImageError] = useState(false);
   return (
-    <TouchableOpacity onPress={() => onSelect(photo)} activeOpacity={0.85}>
-      <View style={[styles.card, style]}>
-        {/* The image of the photo */}
+    <View style={[styles.card, style]}>
+      {/* The image of the photo */}
+      <TouchableOpacity onPress={() => onSelect(photo)} activeOpacity={0.85}>
         {imageError ? (
           <View style={styles.placeholder}>
             <Text style={styles.placeholderText}>Image not available</Text>
@@ -29,18 +31,33 @@ const PhotoCard = ({ photo, onSelect, onDelete, style }) => {
             onError={() => setImageError(true)}
           />
         )}
-        {/* The timestamp and description of the photo */}
-        <Text style={styles.timestamp}>{new Date(photo.timestamp).toLocaleString()}</Text>
-        <Text numberOfLines={2} style={styles.description}>{photo.description}</Text>
-        {/* The Delete button */}
-        <View style={styles.deleteWrapper}>
-          <Button title="Delete" color="#ff4d4d" onPress={() => onDelete(photo.id)} />
-        </View>
-        {photo.tags && photo.tags.map((tag, idx) => (
-          <Text key={tag + '-' + idx}>{tag}</Text>
-        ))}
+      </TouchableOpacity>
+      
+      {/* The timestamp and description of the photo */}
+      <Text style={styles.timestamp}>{new Date(photo.timestamp).toLocaleString()}</Text>
+      <Text numberOfLines={2} style={styles.description}>{photo.description}</Text>
+      
+      {/* Action buttons */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity 
+          style={styles.viewDetailsButton}
+          onPress={() => onViewDetails(photo)}
+        >
+          <Text style={styles.viewDetailsText}>👁️ View Details</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={styles.deleteButton}
+          onPress={() => onDelete(photo.id)}
+        >
+          <Text style={styles.deleteText}>🗑️ Delete</Text>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+      
+      {photo.tags && photo.tags.map((tag, idx) => (
+        <Text key={tag + '-' + idx}>{tag}</Text>
+      ))}
+    </View>
   );
 };
 
@@ -87,9 +104,39 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 15,
     color: '#222',
-    marginBottom: 8,
+    marginBottom: 12,
   },
-  deleteWrapper: {
-    alignItems: 'flex-end',
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  viewDetailsButton: {
+    backgroundColor: '#4f8cff',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    flex: 1,
+    marginRight: 8,
+    alignItems: 'center',
+  },
+  viewDetailsText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  deleteButton: {
+    backgroundColor: '#ff4d4d',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    flex: 1,
+    marginLeft: 8,
+    alignItems: 'center',
+  },
+  deleteText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });

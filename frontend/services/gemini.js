@@ -9,7 +9,7 @@ import axios from 'axios';
 export const getDescriptionFromGemini = async (base64Image) => {
   try {
     // Send a POST request to the Gemini API endpoint with the image data
-    const response = await axios.post('http://192.168.0.104:3000/gemini', {
+    const response = await axios.post('http://10.33.54.6:3000/gemini', {
       image: base64Image
     });
 
